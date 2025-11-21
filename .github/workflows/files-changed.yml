@@ -16,6 +16,9 @@ jobs:
   detect:
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    permissions:
+      contents: read
+      pull-requests: write
     outputs:
       app: ${{ steps.changes.outputs.app }}
       actions: ${{ steps.changes.outputs.actions }}
