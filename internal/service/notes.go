@@ -57,7 +57,7 @@ func (s *NoteService) Update(note database.Note, title, body string) {
 func (s *NoteService) FindAndUpdate(noteID int, title, body string) database.Note {
 	note := s.Get(noteID)
 	s.Update(note, title, body)
-	return note
+	return s.Get(noteID)
 }
 
 func (s *NoteService) Delete(noteID string) {
