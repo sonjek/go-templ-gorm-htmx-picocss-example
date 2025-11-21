@@ -12,8 +12,17 @@ type wrappedWriter struct {
 }
 
 func (w *wrappedWriter) WriteHeader(sc int) {
-	w.ResponseWriter.WriteHeader(sc)
+	if w.statusCode == 0 {
+		w.ResponseWriter.WriteHeader(sc)
+	}
 	w.statusCode = sc
+}
+
+func (w *wrappedWriter) Write(data []byte) (int, error) {
+	if w.statusCode == 0 {
+		w.statusCode = http.StatusOK
+	}
+	return w.ResponseWriter.Write(data)
 }
 
 func LoggingMiddleware(next http.Handler) http.Handler {
@@ -22,11 +31,15 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 
 		wrapped := &wrappedWriter{
 			ResponseWriter: w,
-			statusCode:     http.StatusOK,
+			statusCode:     0,
 		}
 
 		next.ServeHTTP(wrapped, r)
 
-		log.Println(wrapped.statusCode, r.Method, r.URL.Path, time.Since(start))
+		statusCode := wrapped.statusCode
+		if statusCode == 0 {
+			statusCode = http.StatusOK
+		}
+		log.Println(statusCode, r.Method, r.URL.Path, time.Since(start))
 	})
 }
