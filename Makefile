@@ -57,14 +57,12 @@ get-deps: check-go
 ## generate-web: Compile templ files via github.com/a-h/templ/cmd/templ
 .PHONY: generate-web
 generate-web: check-go
-	go install github.com/a-h/templ/cmd/templ@latest
-	~/go/bin/templ generate
+	go tool templ generate
 
 ## air: Build and start application in live reload mode via air
 .PHONY: air
 air: get-deps generate-web
-	go install github.com/air-verse/air@latest
-	air
+	go tool air
 
 ## format: Fix code format issues
 .PHONY: format
