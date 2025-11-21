@@ -34,7 +34,6 @@ Commands:
   generate-web   Compile templ files via github.com/a-h/templ/cmd/templ
   air            Build and start application in live reload mode via air
   format         Fix code format issues
-  deadcode       Run deadcode tool for find unreachable functions
   audit          Quality checks
   check-go       Check that Go is installed
   help           Display help
@@ -46,11 +45,9 @@ To get started, follow these steps:
 
 1) Run `make start` to download go dependencies, compile templ files, build application and finally start application.
 ```sh
-% make tools
-go install github.com/a-h/templ/cmd/templ@latest
 % make start
 go mod download
-~/go/bin/templ generate
+go tool templ generate
 (✓) Complete [ updates=7 duration=13.893847ms ]
 go run ./cmd/app
 Starting web interface on port: 8089
