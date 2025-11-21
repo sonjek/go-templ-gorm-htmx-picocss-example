@@ -20,6 +20,9 @@ jobs:
     if: needs.files-changed.outputs.lint == 'true' || needs.files-changed.outputs.actions == 'true'
     needs: files-changed
     runs-on: macos-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
     - name: Checkout
       uses: actions/checkout@v6
@@ -42,6 +45,9 @@ jobs:
     if: needs.files-changed.outputs.app == 'true' || needs.files-changed.outputs.actions == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
     - uses: actions/checkout@v6
       with:
@@ -58,6 +64,9 @@ jobs:
     if: needs.files-changed.outputs.app == 'true' || needs.files-changed.outputs.actions == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
     - uses: actions/checkout@v6
       with:
