@@ -1,3 +1,5 @@
+GOLANGCI_LINT_PACKAGE ?= github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2
+
 # -------------------------------------------------------------------------------------------------
 # main
 # -------------------------------------------------------------------------------------------------
@@ -47,10 +49,20 @@ generate-web: check-go
 air: get-deps generate-web
 	go tool air
 
-## format: Fix code format issues
-.PHONY: format
-format:
-	go run mvdan.cc/gofumpt@latest -w -l .
+## lint: Run golangci-lint to lint go files
+.PHONY: lint
+lint:
+	go run $(GOLANGCI_LINT_PACKAGE) run
+
+## lint-fix: Run golangci-lint to lint go files and fix issues
+.PHONY: lint-fix
+lint-fix:
+	go run $(GOLANGCI_LINT_PACKAGE) run --fix
+
+## lint-fmt: Run golangci-lint fmt to show code format issues
+.PHONY: lint-fmt
+lint-fmt:
+	go run $(GOLANGCI_LINT_PACKAGE) fmt
 
 ## audit: Quality checks
 .PHONY: audit
