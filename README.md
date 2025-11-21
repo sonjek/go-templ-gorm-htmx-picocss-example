@@ -28,13 +28,15 @@ Commands:
   build-docker   Build Docker container image with this app
   run-docker     Run Docker container image with this app
   test           Run unit tests
+  generate-web   Compile templ files via github.com/a-h/templ/cmd/templ
+  air            Build and start application in live reload mode via air
+  lint           Run golangci-lint to lint go files
+  lint-fix       Run golangci-lint to lint go files and fix issues
+  lint-fmt       Run golangci-lint fmt to show code format issues
+  audit          Quality checks
   tidy           Removes unused dependencies and adds missing ones
   update-deps    Update go dependencies
   get-deps       Download go dependencies
-  generate-web   Compile templ files via github.com/a-h/templ/cmd/templ
-  air            Build and start application in live reload mode via air
-  format         Fix code format issues
-  audit          Quality checks
   check-go       Check that Go is installed
   help           Display help
 ```

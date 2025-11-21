@@ -22,7 +22,7 @@ jobs:
       lint: ${{ steps.changes.outputs.lint }}
       docs: ${{ steps.changes.outputs.docs }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: dorny/paths-filter@v3
