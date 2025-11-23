@@ -59,12 +59,12 @@ generate-web: check-go
 air: get-deps generate-web
 	go tool air
 
-## lint: Run golangci-lint to lint go files
+## lint: Run golangci-lint to lint Go files
 .PHONY: lint
 lint:
 	go run $(GOLANGCI_LINT_PACKAGE) run
 
-## lint-fix: Run golangci-lint to lint go files and fix issues
+## lint-fix: Run golangci-lint to lint Go files and fix issues
 .PHONY: lint-fix
 lint-fix:
 	go run $(GOLANGCI_LINT_PACKAGE) run --fix
@@ -90,13 +90,13 @@ audit:
 tidy: check-go
 	go mod tidy
 
-## update-deps: Update go dependencies
+## update-deps: Update Go dependencies
 .PHONY: update-deps
 update-deps: check-go
 	go get -u ./...
 	-@$(MAKE) tidy
 
-## get-deps: Download go dependencies
+## get-deps: Download Go dependencies
 .PHONY: get-deps
 get-deps: check-go
 	go mod download
