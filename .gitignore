@@ -1,5 +1,8 @@
 bin
 tmp
+node_modules
+internal/web/static/css/
+internal/web/static/js/
 
 .DS_Store
 

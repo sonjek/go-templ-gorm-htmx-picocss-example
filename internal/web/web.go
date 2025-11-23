@@ -63,7 +63,8 @@ func (ws Server) Start() {
 	// Create stack for handle multiple middlewares
 	middlewares := middleware.CreateMiddlewareStack(
 		middleware.LoggingMiddleware,
-		middleware.DemoMiddleware,
+		middleware.CacheStaticFiles,
+		middleware.SlowdownMiddleware,
 	)
 
 	server := &http.Server{

@@ -27,16 +27,17 @@ Commands:
   start          Build and start application
   build-docker   Build Docker container image with this app
   run-docker     Run Docker container image with this app
+  get-js-deps    Install frontend dependencies using bun (locally if available and otherwise via Docker)
   test           Run unit tests
   generate-web   Compile templ files via github.com/a-h/templ/cmd/templ
   air            Build and start application in live reload mode via air
-  lint           Run golangci-lint to lint go files
-  lint-fix       Run golangci-lint to lint go files and fix issues
+  lint           Run golangci-lint to lint Go files
+  lint-fix       Run golangci-lint to lint Go files and fix issues
   lint-fmt       Run golangci-lint fmt to show code format issues
   audit          Quality checks
   tidy           Removes unused dependencies and adds missing ones
-  update-deps    Update go dependencies
-  get-deps       Download go dependencies
+  update-deps    Update Go dependencies
+  get-deps       Download Go dependencies
   check-go       Check that Go is installed
   help           Display help
 ```
