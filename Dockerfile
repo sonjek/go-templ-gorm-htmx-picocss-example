@@ -1,11 +1,11 @@
-FROM golang:1.25-alpine3.22 AS builder
+FROM golang:1.25 AS builder
 WORKDIR /app
-RUN apk --update add --no-cache ca-certificates tzdata make && update-ca-certificates
+RUN apt update && apt install -y --no-install-recommends ca-certificates tzdata make curl upx
+COPY --from=oven/bun:1.3 /usr/local/bin/bun /usr/local/bin/bun
 COPY . .
-RUN export GOPATH="/root/go" && make build
+RUN make build
 
-# Pach binary file
-RUN apk add upx
+# Pack binary file
 RUN upx bin/app
 
 FROM scratch

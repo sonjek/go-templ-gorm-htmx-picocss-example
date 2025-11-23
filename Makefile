@@ -8,12 +8,12 @@ all: help
 
 ## build: Compile templ files and build application
 .PHONY: build
-build: get-deps generate-web
+build: get-deps get-js-deps generate-web
 	CGO_ENABLED=0 go build -ldflags="-s -w -extldflags '-static'" -trimpath -o 'bin/app' ./cmd/app
 
 ## start: Build and start application
 .PHONY: start
-start: get-deps generate-web
+start: get-deps get-js-deps generate-web
 	go run ./cmd/app
 
 ## build-docker: Build Docker container image with this app
@@ -25,6 +25,16 @@ build-docker:
 .PHONY: run-docker
 run-docker:
 	docker run --rm -it -p 8089:8089 $(shell basename $(PWD)):latest
+
+## get-js-deps: Install frontend dependencies using bun (locally if available and otherwise via Docker)
+.PHONY: get-js-deps
+get-js-deps:
+	@command -v bun &> /dev/null && bun install || docker run --rm -v "$(PWD):/app" -w /app oven/bun:1.3 bun install
+	@mkdir -p internal/web/static/js internal/web/static/css
+	@cp node_modules/htmx.org/dist/htmx.min.js internal/web/static/js/
+	@cp node_modules/htmx-ext-response-targets/dist/response-targets.min.js internal/web/static/js/
+	@cp node_modules/@picocss/pico/css/pico.min.css internal/web/static/css/
+	@cp -r node_modules/ionicons/dist/ionicons internal/web/static/js/
 
 # -------------------------------------------------------------------------------------------------
 # testing
