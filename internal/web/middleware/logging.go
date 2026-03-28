@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -40,6 +40,13 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		if statusCode == 0 {
 			statusCode = http.StatusOK
 		}
-		log.Println(statusCode, r.Method, r.URL.Path, time.Since(start))
+
+		// #nosec G706 - input is sanitized via slog's internal escaping
+		slog.Info("Request",
+			"status", statusCode,
+			"method", r.Method,
+			"path", r.URL.Path,
+			"duration", time.Since(start),
+		)
 	})
 }

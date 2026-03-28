@@ -2,7 +2,7 @@ package components
 
 import (
     "strconv"
-    "github.com/sonjek/go-templ-htmx-picocss-example/pkg/utils"
+    "github.com/sonjek/go-templ-htmx-picocss-example/pkg/datetime"
     "github.com/sonjek/go-templ-htmx-picocss-example/internal/storage"
 )
 
@@ -41,7 +41,7 @@ templ noteData(note storage.Note) {
         { note.Body }
     </p>
     <footer>
-        <small class="align-right"><ion-icon name="calendar-outline"></ion-icon> <ins data-tooltip={ utils.FormatToAgo(note.CreatedAt) }>{ utils.FormatToDateTime(note.CreatedAt) }</ins></small>
+        <small class="align-right"><ion-icon name="calendar-outline"></ion-icon> <ins data-tooltip={ datetime.FormatToAgo(note.CreatedAt) }>{ datetime.FormatToDateTime(note.CreatedAt) }</ins></small>
     </footer>
 }
 
