@@ -37,6 +37,7 @@ func sendErrorMsg(w http.ResponseWriter, r *http.Request, errorMsg string) {
 }
 
 func (h *Handlers) Page404(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
 	templ.Handler(
 		page.Index(view.NotFoundComponent()),
 	).ServeHTTP(w, r)
