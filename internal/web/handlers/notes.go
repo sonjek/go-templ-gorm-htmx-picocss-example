@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -13,7 +14,24 @@ import (
 const (
 	pageSize  = 2
 	timeoutMs = 300
+
+	maxFormBodyBytes = 1 << 20 // 1 MiB
 )
+
+func parseFormWithBodyLimit(w http.ResponseWriter, r *http.Request) error {
+	r.Body = http.MaxBytesReader(w, r.Body, maxFormBodyBytes)
+	return r.ParseForm()
+}
+
+func respondFormParseError(w http.ResponseWriter, r *http.Request, err error) {
+	var maxBytesErr *http.MaxBytesError
+	if errors.As(err, &maxBytesErr) {
+		w.WriteHeader(http.StatusRequestEntityTooLarge)
+		handleRenderError(components.ErrorMsg("Request body too large").Render(r.Context(), w))
+		return
+	}
+	sendErrorMsg(w, r, "Invalid form")
+}
 
 func (h *Handlers) Notes(w http.ResponseWriter, r *http.Request) {
 	notes, err := h.noteService.LoadMore(0, pageSize)
@@ -51,13 +69,18 @@ func (h *Handlers) CreateNoteModal(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) CreateNote(w http.ResponseWriter, r *http.Request) {
-	title := r.FormValue("title")
+	if err := parseFormWithBodyLimit(w, r); err != nil {
+		respondFormParseError(w, r, err)
+		return
+	}
+
+	title := r.PostForm.Get("title")
 	if title == "" {
 		sendErrorMsg(w, r, "Title is empty")
 		return
 	}
 
-	body := r.FormValue("body")
+	body := r.PostForm.Get("body")
 	if body == "" {
 		sendErrorMsg(w, r, "Body is empty")
 		return
@@ -90,13 +113,18 @@ func (h *Handlers) EditNoteModal(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) EditNote(w http.ResponseWriter, r *http.Request) {
-	title := r.FormValue("title")
+	if err := parseFormWithBodyLimit(w, r); err != nil {
+		respondFormParseError(w, r, err)
+		return
+	}
+
+	title := r.PostForm.Get("title")
 	if title == "" {
 		sendErrorMsg(w, r, "Title is empty")
 		return
 	}
 
-	body := r.FormValue("body")
+	body := r.PostForm.Get("body")
 	if body == "" {
 		sendErrorMsg(w, r, "Body is empty")
 		return
