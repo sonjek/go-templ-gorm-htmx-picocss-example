@@ -2,65 +2,71 @@ package components
 
 import (
     "strconv"
-    "github.com/sonjek/go-templ-htmx-picocss-example/pkg/datetime"
-    "github.com/sonjek/go-templ-htmx-picocss-example/internal/storage"
+    "github.com/sonjek/go-full-stack-example/pkg/datetime"
+    "github.com/sonjek/go-full-stack-example/internal/storage"
 )
 
-templ noteData(note storage.Note) {
-    <header>
-        <nav>
-            <ul>
-                <li><strong>{ note.Title }</strong></li>
-            </ul>
-            <ul>
-                <li>
-                    <details class="dropdown">
-                        <summary>
-                            <ion-icon name="menu-outline"/>
-                        </summary>
-                        <ul>
-                            <li><small><a class="contrast"
-                                hx-trigger="click"
-                                hx-get={ "/edit/" + strconv.Itoa(note.ID) }
-                                hx-target="#dialog"
-                                hx-target-error="#error"
-                                hx-swap="outerHTML">Edit <ion-icon name="create"/></a></small></li>
-                            <li><small><a class="contrast"
-                                hx-trigger="click"
-                                hx-delete={ "/note/" + strconv.Itoa(note.ID) }
-                                hx-target={ "#note-" + strconv.Itoa(note.ID) }
-                                hx-target-error="#error"
-                                hx-swap="outerHTML">Delete <ion-icon name="trash"/></a></small></li>
-                        </ul>
-                    </details>
-                </li>
-            </ul>
-        </nav>
-    </header>
-    <p>
-        { note.Body }
-    </p>
-    <footer>
-        <small class="align-right"><ion-icon name="calendar-outline"></ion-icon> <ins data-tooltip={ datetime.FormatToAgo(note.CreatedAt) }>{ datetime.FormatToDateTime(note.CreatedAt) }</ins></small>
-    </footer>
-}
+templ NoteItem(note storage.Note, loadMoreURL ...string) {
+    <div
+        id={ "note-" + strconv.Itoa(note.ID) }
+        class="card shadow-xl bg-base-100 mb-5 overflow-hidden"
+        if len(loadMoreURL) > 0 && loadMoreURL[0] != "" {
+            hx-get={ loadMoreURL[0] }
+            hx-trigger="intersect once"
+            hx-target="this"
+            hx-swap="afterend"
+            hx-push-url="false"
+            hx-indicator=".htmx-indicator"
+        }
+    >
+        <div class="px-6 py-4 flex justify-between items-center rounded-t-2xl border-b border-neutral">
+            <h3 class="font-bold text-sm text-base-content/70 tracking-widest truncate">
+                { note.Title }
+            </h3>
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle btn-xs">
+                    <ion-icon name="ellipsis-vertical" class="text-lg"></ion-icon>
+                </div>
+                <ul tabindex="0" class="dropdown-content z-[10] menu w-40 p-2 bg-base-200/40">
+                    <li>
+                        <a
+                            hx-get={ "/edit/" + strconv.Itoa(note.ID) }
+                            hx-target="#dialog"
+                            hx-swap="outerHTML"
+                            hx-target-error="#error"
+                        >Edit</a>
+                    </li>
+                    <li>
+                        <a
+                            hx-delete={ "/note/" + strconv.Itoa(note.ID) }
+                            hx-target={ "#note-" + strconv.Itoa(note.ID) }
+                            hx-swap="delete"
+                            hx-target-error="#error"
+                            class="text-error"
+                        >Delete</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-templ NoteItem(note storage.Note) {
-	<article id={ "note-" + strconv.Itoa(note.ID) }>
-		@noteData(note)
-	</article>
+        <div class="card-body p-6 border-b border-neutral">
+            <p class="text-base-content/90 whitespace-pre-wrap leading-relaxed">
+                { note.Body }
+            </p>
+        </div>
+
+        <div class="px-6 py-3 rounded-b-2xl flex justify-between items-center text-[10px] font-bold opacity-40">
+            <div class="flex items-center gap-1">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>{ datetime.FormatToDateTime(note.CreatedAt) } ({ datetime.FormatToAgo(note.CreatedAt) })</span>
+            </div>
+            <div class="badge badge-sm px-2">
+            { note.ID }
+            </div>
+        </div>
+    </div>
 }
 
 templ LastNote(note storage.Note) {
-	<article
-        id={ "note-" + strconv.Itoa(note.ID) }
-        hx-get={ "/notes/load-more?cursor=" + strconv.Itoa(note.ID) }
-        hx-push-url="false"
-        hx-trigger="intersect once"
-        hx-target="#notes"
-        hx-swap="beforeend"
-        hx-indicator=".htmx-indicator">
-		@noteData(note)
-	</article>
+    @NoteItem(note, "/notes/load-more?cursor=" + strconv.Itoa(note.ID))
 }
-

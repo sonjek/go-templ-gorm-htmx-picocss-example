@@ -2,21 +2,15 @@ package components
 
 import (
     "strconv"
-    "github.com/sonjek/go-templ-htmx-picocss-example/internal/storage"
+    "github.com/sonjek/go-full-stack-example/internal/storage"
 )
 
 templ ModalEditNote(note storage.Note) {
-    <dialog open id="dialog">
-        <form
-            hx-put={ "/note/" + strconv.Itoa(note.ID) }
-            hx-target={ "#note-" + strconv.Itoa(note.ID) }
-            hx-target-error="#error"
-            hx-swap="outerHTML"
-            hx-indicator=".htmx-indicator"
-            hx-on::before-request="clearError()"
-            hx-on::after-request="closeDialogOnSuccess()"
-        >
-            @ModalForm("Edit note", "Updating Note...", "Update", note.Title, note.Body)
-        </form>
-    </dialog>
+    @Modal(
+        "put",
+        "/note/" + strconv.Itoa(note.ID),
+        "#note-" + strconv.Itoa(note.ID),
+        "outerHTML",
+        ModalForm("Edit Note", "Updating Note...", "Update Note", note.Title, note.Body),
+    )
 }

@@ -59,6 +59,8 @@ jobs:
       with:
         go-version-file: go.mod
         check-latest: true
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2.2.0
     - name: Run generate templ files
       run: make generate-web
     - name: Run tests
@@ -78,5 +80,7 @@ jobs:
       with:
         go-version-file: go.mod
         check-latest: true
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2.2.0
     - name: Build
       run: make build

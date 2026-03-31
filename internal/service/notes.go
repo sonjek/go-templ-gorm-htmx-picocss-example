@@ -1,7 +1,7 @@
 package service
 
 import (
-	database "github.com/sonjek/go-templ-htmx-picocss-example/internal/storage"
+	database "github.com/sonjek/go-full-stack-example/internal/storage"
 	"gorm.io/gorm"
 )
 

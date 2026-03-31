@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/service"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/storage"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web/handlers"
+	"github.com/sonjek/go-full-stack-example/internal/service"
+	"github.com/sonjek/go-full-stack-example/internal/storage"
+	"github.com/sonjek/go-full-stack-example/internal/web"
+	"github.com/sonjek/go-full-stack-example/internal/web/handlers"
 )
 
 func main() {

@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/service"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web/templ/components"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web/templ/page"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web/templ/view"
+	"github.com/sonjek/go-full-stack-example/internal/service"
+	"github.com/sonjek/go-full-stack-example/internal/web/templ/components"
+	"github.com/sonjek/go-full-stack-example/internal/web/templ/page"
+	"github.com/sonjek/go-full-stack-example/internal/web/templ/view"
 	"gorm.io/gorm"
 )
 

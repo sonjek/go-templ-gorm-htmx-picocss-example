@@ -1,10 +1,13 @@
 bin
 tmp
 node_modules
-internal/web/static/css/
+internal/web/static/css/*
+!internal/web/static/css/input.css
 internal/web/static/js/
 
 .DS_Store
+
+.deps-stamp
 
 # Ignore compiled templ files
 internal/web/**/*_templ.go

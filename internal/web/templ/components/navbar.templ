@@ -1,0 +1,43 @@
+package components
+
+templ Navbar() {
+    <div class="border-b border-neutral/30 bg-base-100/50 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-3xl mx-auto flex justify-between items-center px-4 h-12">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
+                    <ion-icon name="journal" class="text-primary-content text-sm"></ion-icon>
+                </div>
+                <span class="text-[11px] font-black uppercase tracking-[0.3em] opacity-70">Notebook</span>
+            </div>
+
+            <div class="flex items-center">
+                <label class="swap swap-rotate btn btn-ghost btn-xs btn-circle">
+                    <input type="checkbox" id="theme-toggle" class="theme-controller" value="light" />
+                    <ion-icon name="sunny-outline" class="swap-on text-lg text-warning"></ion-icon>
+                    <ion-icon name="moon-outline" class="swap-off text-lg text-primary"></ion-icon>
+                </label>
+
+                <div class="w-px h-5 bg-neutral/30 mx-2"></div>
+
+                <a href="/user" class="btn btn-ghost btn-xs btn-circle opacity-50" aria-label="User">
+                    <ion-icon name="person-outline" class="text-lg"></ion-icon>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const toggle = document.getElementById('theme-toggle');
+            if (toggle) {
+                const currentTheme = document.documentElement.getAttribute("data-theme");
+                toggle.checked = currentTheme === "light";
+                toggle.addEventListener("change", (e) => {
+                    const newTheme = e.target.checked ? "light" : "dark";
+                    document.documentElement.setAttribute("data-theme", newTheme);
+                    localStorage.setItem("theme", newTheme);
+                });
+            }
+        })();
+    </script>
+}

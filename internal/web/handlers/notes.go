@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web/templ/components"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web/templ/page"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web/templ/view"
+	"github.com/sonjek/go-full-stack-example/internal/web/templ/components"
+	"github.com/sonjek/go-full-stack-example/internal/web/templ/page"
+	"github.com/sonjek/go-full-stack-example/internal/web/templ/view"
 )
 
 const (
