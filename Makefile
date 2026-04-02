@@ -8,13 +8,17 @@ all: help
 
 ## build: Compile templ files and build application
 .PHONY: build
-build: get-deps get-js-deps generate-web
+build: prepare-data
 	CGO_ENABLED=0 go build -ldflags="-s -w -extldflags '-static'" -trimpath -o 'bin/app' ./cmd/app
 
 ## start: Build and start application
 .PHONY: start
-start: get-deps get-js-deps generate-web
+start: prepare-data
 	go run ./cmd/app
+
+## dev: Build and start application in live reload mode
+.PHONY: dev
+dev: air
 
 ## build-docker: Build Docker container image with this app
 .PHONY: build-docker
@@ -26,6 +30,14 @@ build-docker:
 run-docker:
 	docker run --rm -it -p 8089:8089 $(shell basename $(PWD)):latest
 
+## prepare-data: Prepare data for the application
+.PHONY: prepare-data
+prepare-data: .deps-stamp get-js-deps generate-web
+
+.deps-stamp: go.mod go.sum
+	go mod download
+	@touch .deps-stamp
+
 ## get-js-deps: Install frontend dependencies using bun (locally if available and otherwise via Docker)
 .PHONY: get-js-deps
 get-js-deps:
@@ -33,7 +45,7 @@ get-js-deps:
 	@mkdir -p internal/web/static/js internal/web/static/css
 	@cp node_modules/htmx.org/dist/htmx.min.js internal/web/static/js/
 	@cp node_modules/htmx-ext-response-targets/dist/response-targets.min.js internal/web/static/js/
-	@cp node_modules/@picocss/pico/css/pico.min.css internal/web/static/css/
+	@bun tailwindcss -i internal/web/static/css/input.css -o internal/web/static/css/style.css --minify
 	@cp -r node_modules/ionicons/dist/ionicons internal/web/static/js/
 
 # -------------------------------------------------------------------------------------------------
@@ -56,7 +68,7 @@ generate-web: check-go
 
 ## air: Build and start application in live reload mode via air
 .PHONY: air
-air: get-deps generate-web
+air: prepare-data
 	go tool air
 
 ## lint: Run golangci-lint to lint Go files
@@ -69,9 +81,9 @@ lint:
 lint-fix:
 	go run $(GOLANGCI_LINT_PACKAGE) run --fix
 
-## lint-fmt: Run golangci-lint fmt to show code format issues
-.PHONY: lint-fmt
-lint-fmt:
+## format: Run golangci-lint fmt to show code format issues
+.PHONY: format
+format:
 	go run $(GOLANGCI_LINT_PACKAGE) fmt
 
 ## audit: Quality checks

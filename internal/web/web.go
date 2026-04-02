@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web/handlers"
-	"github.com/sonjek/go-templ-htmx-picocss-example/internal/web/middleware"
+	"github.com/sonjek/go-full-stack-example/internal/web/handlers"
+	"github.com/sonjek/go-full-stack-example/internal/web/middleware"
 )
 
 type Server struct {

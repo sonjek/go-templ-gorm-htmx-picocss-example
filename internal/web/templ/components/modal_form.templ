@@ -1,38 +1,63 @@
 package components
 
 templ ModalForm(title, loaderMsg, action, noteTitle, noteBody string) {
-    <article>
-        <header class="align-center">
-            <h2>{ title }</h2>
+    <div class="flex flex-col">
+        <header class="px-6 py-2 border-b border-neutral flex justify-between items-center bg-base-200/30">
+            <h2 class="text-[11px] font-black uppercase tracking-widest text-base-content/50">
+                { title }
+            </h2>
+            <button type="button" onclick="window.closeDialog()" class="btn btn-ghost btn-xs btn-circle">
+                <ion-icon name="close-outline" class="text-base"></ion-icon>
+            </button>
         </header>
 
-        <div id="error"></div>
-        <fieldset>
-            <label>Title
-                <input name="title" placeholder="Note title" value={ noteTitle } autocomplete="title" required />
-                <small>
-                    Empty value allows to show a browser verification error message.
-                </small>
-            </label>
-            <label>Body
-                <textarea name="body" placeholder="Write note body..." aria-label="Body of note">
-                    { noteBody }
-                </textarea>
-                <small>
-                    Empty value allows to show a backend verification error message.
-                </small>
-            </label>
-        </fieldset>
-        <span aria-busy="true" class="htmx-indicator align-center">{ loaderMsg }</span>
+        <div class="px-6 py-3 space-y-2">
+            <div id="modal-error" class="mb-2"></div>
 
-        <footer>
-            <button>{ action }</button>
-            <button id="close-dialog-btn" class="outline secondary">Cancel</button>
+            <div>
+                <label class="label pt-0 pb-0.5" for="note-form-title">
+                    <span class="text-[11px] font-bold uppercase opacity-40">Title</span>
+                </label>
+                <input
+                    id="note-form-title"
+                    name="title"
+                    type="text"
+                    placeholder="Note title..."
+                    value={ noteTitle }
+                    required
+                    class="input input-sm w-full max-w-none focus:input-primary bg-base-200/50 font-bold text-sm"
+                />
+            </div>
+
+            <div>
+                <label class="label pt-0 pb-0.5" for="note-form-body">
+                    <span class="text-[11px] font-bold uppercase opacity-40">Content</span>
+                </label>
+                <textarea
+                    id="note-form-body"
+                    name="body"
+                    placeholder="Write something..."
+                    class="textarea textarea-md w-full max-w-none h-40 focus:textarea-primary bg-base-200/50 text-base-content/90 text-base leading-relaxed"
+                >{ noteBody }</textarea>
+            </div>
+
+            <div class="htmx-indicator flex items-center gap-2 text-primary/60">
+                <span class="loading loading-spinner loading-xs"></span>
+                <span class="text-[9px] font-bold uppercase tracking-tighter">{ loaderMsg }</span>
+            </div>
+        </div>
+
+        <footer class="px-6 py-3 bg-base-200/50 border-t border-neutral flex justify-end gap-2">
+            <button
+                type="button"
+                onclick="window.closeDialog()"
+                class="btn btn-ghost btn-sm h-8 border-neutral font-bold"
+            >
+                Cancel
+            </button>
+            <button type="submit" class="btn btn-primary btn-outline btn-sm h-8 shadow-md font-bold px-6">
+                { action }
+            </button>
         </footer>
-    </article>
-    <script>
-        document.getElementById('close-dialog-btn').addEventListener('click', function() {
-            closeDialog()
-        })
-    </script>
+    </div>
 }

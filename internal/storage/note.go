@@ -23,6 +23,11 @@ var NotesSeed = []Note{
 		CreatedAt: time.Date(2017, 4, 20, 23, 17, 29, 0, time.UTC),
 	},
 	{
+		Title:     "Tailwind CSS",
+		Body:      "A utility-first CSS framework for rapid UI development.",
+		CreatedAt: time.Date(2017, 11, 1, 21, 11, 0, 0, time.UTC),
+	},
+	{
 		Title:     "GoLang",
 		Body:      "The Go programming language.",
 		CreatedAt: time.Date(2018, 9, 25, 22, 20, 0, 0, time.UTC),
@@ -41,6 +46,11 @@ var NotesSeed = []Note{
 		Title:     "htmx.js",
 		Body:      "</> htmx - high power tools for HTML.",
 		CreatedAt: time.Date(2022, 8, 10, 21, 21, 0, 0, time.UTC),
+	},
+	{
+		Title:     "daisyUI",
+		Body:      "The most popular, free and open-source Tailwind CSS component library.",
+		CreatedAt: time.Date(2023, 11, 13, 12, 49, 0, 0, time.UTC),
 	},
 }
 

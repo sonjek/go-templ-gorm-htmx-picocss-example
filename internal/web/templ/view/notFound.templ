@@ -1,5 +1,28 @@
 package view
 
 templ NotFoundComponent() {
-	<div class="align-center">404 - Not found</div>
+    <div class="max-w-xl mx-auto px-4 mt-20 text-center">
+        <div class="inline-flex mb-6 text-base-content/10">
+            <ion-icon name="navigate-outline" class="text-7xl"></ion-icon>
+        </div>
+
+        <h1 class="text-[11px] font-black uppercase tracking-[0.3em] text-base-content/40 mb-2">
+            Error 404
+        </h1>
+
+        <h2 class="text-xl font-bold mb-4">Page not found</h2>
+
+        <p class="text-sm text-base-content/60 max-w-xs mx-auto mb-8 leading-relaxed">
+            The link you followed may be broken, or the page may have been removed.
+        </p>
+
+        <div class="flex justify-center gap-3">
+            <button onclick="history.back()" class="btn btn-ghost btn-xs h-8 border-neutral px-4 text-[10px] uppercase font-bold">
+                Go Back
+            </button>
+            <a href="/" class="btn btn-primary btn-outline btn-xs h-8 px-6 text-[10px] uppercase font-bold shadow-md">
+                Home
+            </a>
+        </div>
+    </div>
 }

@@ -1,59 +1,39 @@
-# go-templ-htmx-picocss-example
+# go-full-stack-example
 
-Example of a Web CRUD app based on [Go](https://github.com/golang/go) + ([sqlite](https://gitlab.com/cznic/sqlite) + [gorm](https://github.com/go-gorm/gorm)) + [templ](https://github.com/a-h/templ) + [</>htmx](https://github.com/bigskysoftware/htmx) + [PicoCSS](https://github.com/picocss/pico) + [Ionicons](https://github.com/ionic-team/ionicons)
+Example of full-stack Go based Web app
 
+[![GO](https://img.shields.io/badge/go-%233366CC.svg?logo=go&logoColor=white)](https://go.dev) [![templ](https://img.shields.io/badge/templ-%233366CC.svg?logo=htmx&logoColor=white)](https://github.com/a-h/templ) [![HTMX](https://img.shields.io/badge/htmx-%233366CC.svg?logo=htmx&logoColor=white)](https://github.com/bigskysoftware/htmx) [![SQLite](https://img.shields.io/badge/sqlite-%233366CC.svg?logo=sqlite&logoColor=white)](https://gitlab.com/cznic/sqlite) [![GORM](https://img.shields.io/badge/gorm-%233366CC.svg?logo=sqlite&logoColor=white)](https://github.com/go-gorm/gorm) [![tailwindcss](https://img.shields.io/badge/tailwindcss-%233366CC.svg?logo=tailwindcss&logoColor=white)](https://github.com/tailwindlabs/tailwindcss) [![daisyui](https://img.shields.io/badge/daisyui-%233366CC.svg?logo=daisyui&logoColor=white)](https://daisyui.com) [![ionicons](https://img.shields.io/badge/ionicons-%233366CC.svg?logo=ionic&logoColor=white)](https://github.com/ionic-team/ionicons)
 
-![demo](demo.gif)
 
 Features:
 - Comfortable and flexible component based templates via [templ](https://github.com/a-h/templ)
-- CRUD functionality
+- CRUD functionality (Create, Read, Update, and Delete entries)
 - Persistent storage via [SQLite](https://gitlab.com/cznic/sqlite) + ORM ([gorm](https://github.com/go-gorm/gorm))
-- Modal windows
-- Error handling on user interface side
-- Infinite scroll (Lazy Loading)
-- User frendly interface
+- Error handling on server and user interface side
+- Infinite Scrolling via lazy loading
+- User friendly interface
+- Interactive Modals for better UX
+- Native light and dark mode support
 - Preserve static files
 
-## Develop
+## Quick start
 
-Available makefile actions:
-```sh
-% make
-Usage:  make COMMAND
+```bash
+# 1. Clone this repository
+git clone https://github.com/sonjek/go-full-stack-example && cd go-full-stack-example
 
-Commands:
-  build          Compile templ files and build application
-  start          Build and start application
-  build-docker   Build Docker container image with this app
-  run-docker     Run Docker container image with this app
-  get-js-deps    Install frontend dependencies using bun (locally if available and otherwise via Docker)
-  test           Run unit tests
-  generate-web   Compile templ files via github.com/a-h/templ/cmd/templ
-  air            Build and start application in live reload mode via air
-  lint           Run golangci-lint to lint Go files
-  lint-fix       Run golangci-lint to lint Go files and fix issues
-  lint-fmt       Run golangci-lint fmt to show code format issues
-  audit          Quality checks
-  tidy           Removes unused dependencies and adds missing ones
-  update-deps    Update Go dependencies
-  get-deps       Download Go dependencies
-  check-go       Check that Go is installed
-  help           Display help
+# 2. Run (with hot-reload)
+make dev
+
+# Or run (without hot-reload)
+make start
+
+# Or build a binary and run
+make build && bin/app
 ```
 
-## Local Development Setup
+The server starts on `:8089`.
 
-To get started, follow these steps:
+The SQLite database is created automatically and migrations are applied on startup.
 
-1) Run `make start` to download go dependencies, compile templ files, build application and finally start application.
-```sh
-% make start
-go mod download
-go tool templ generate
-(✓) Complete [ updates=7 duration=13.893847ms ]
-go run ./cmd/app
-Starting web interface on port: 8089
-```
-
-You should now be able to access application in your web browser at http://localhost:8089
+---

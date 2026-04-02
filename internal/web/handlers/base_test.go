@@ -15,14 +15,12 @@ func Test_sendErrorMsg(t *testing.T) {
 		errorMsg       string
 		body           io.Reader
 		expectedStatus int
-		expectedBody   string
 	}{
 		{
 			name:           "invalid request",
 			body:           nil,
 			errorMsg:       "MSG",
 			expectedStatus: http.StatusBadRequest,
-			expectedBody:   `<div class="error-msg" role="alert"><strong>Error: </strong> <span>MSG</span></div>`,
 		},
 	}
 
@@ -37,7 +35,9 @@ func Test_sendErrorMsg(t *testing.T) {
 				"unexpected status code. Expected :%d, got: %d", tc.expectedStatus, w.Result().StatusCode)
 
 			body, _ := io.ReadAll(w.Result().Body)
-			assert.Equal(t, tc.expectedBody, string(body), "expected response body")
+			bodyStr := string(body)
+			assert.Contains(t, bodyStr, tc.errorMsg, "error message should be in response")
+			assert.Contains(t, bodyStr, "Error:", "should contain Error label")
 		})
 	}
 }

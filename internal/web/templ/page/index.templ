@@ -1,5 +1,9 @@
 package page
 
+import (
+    "github.com/sonjek/go-full-stack-example/internal/web/templ/components"
+)
+
 templ Index(body templ.Component) {
     <!DOCTYPE html>
     <html lang="en">
@@ -7,30 +11,38 @@ templ Index(body templ.Component) {
             <meta charset="UTF-8"/>
             <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
             <meta name="viewport" content="width=device-width, initial-scale=1"/>
+            <script>
+                (function() {
+                    const theme = localStorage.getItem("theme") ||
+                        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+                    document.documentElement.setAttribute("data-theme", theme);
+                })();
+            </script>
             <script src="/static/js/htmx.min.js"></script>
             <script src="/static/js/response-targets.min.js"></script>
-            <link href="/static/css/pico.min.css" rel="stylesheet"/>
+            <link href="/static/css/style.css" rel="stylesheet"/>
             <script type="module" src="/static/js/ionicons/ionicons.esm.js"></script>
-            <link href="/static/custom.css" rel="stylesheet"/>
-            <title>Notes list</title>
+            <title>Notes App</title>
         </head>
-        <body>
-            <header class="container">
-                <nav>
-                    <ul>
-                        <li><strong><a href="/" class="contrast">Notes list</a></strong></li>
-                    </ul>
-                    <ul>
-                        <li><a href="/notes" class="contrast">Notes List</a></li>
-                    </ul>
-                </nav>
-            </header>
-            <main class="container page-content" hx-ext="response-targets">
+        <body class="min-h-screen bg-base-300 flex flex-col">
+            @components.Navbar()
+
+            <main class="flex-grow container mx-auto px-4 py-4" hx-ext="response-targets">
                 @body
             </main>
-            <footer class="container">
-                <small>Copyright © 2026 <a class="contrast" href="https://github.com/sonjek/go-templ-gorm-htmx-picocss-example">github.com/sonjek/go-templ-gorm-htmx-picocss-example</a></small>
+
+            <footer class="footer footer-center p-4 bg-base-100 border-t border-neutral">
+                <aside>
+                    <p class="opacity-60 text-xs">
+                        Copyright © 2026 -
+                        <a class="link link-hover font-medium" href="https://github.com/sonjek/go-full-stack-example">
+                            github.com/sonjek/go-full-stack-example
+                        </a>
+                    </p>
+                </aside>
             </footer>
+
+            <div id="dialog"></div>
         </body>
     </html>
 }

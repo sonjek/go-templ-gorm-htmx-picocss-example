@@ -1,0 +1,26 @@
+package components
+
+templ Modal(method, url, target, swap string, content templ.Component) {
+    <dialog id="dialog" class="modal bg-black/60 backdrop-blur-sm" open>
+        <div class="modal-box p-0 border border-neutral shadow-2xl max-w-lg overflow-hidden">
+            <form
+                if method == "post" {
+                    hx-post={ url }
+                } else {
+                    hx-put={ url }
+                }
+                hx-target={ target }
+                hx-target-error="#modal-error"
+                hx-swap={ swap }
+                hx-indicator=".htmx-indicator"
+                hx-on::before-request="if(typeof window.clearError === 'function') window.clearError()"
+                hx-on::after-request="if(event.detail.xhr.status >= 200 && event.detail.xhr.status < 300) window.closeDialog()"
+            >
+                @content
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button onclick="window.closeDialog()">close</button>
+        </form>
+    </dialog>
+}

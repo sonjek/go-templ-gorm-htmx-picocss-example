@@ -1,13 +1,19 @@
 {
-  "name": "go-templ-gorm-htmx-picocss-example",
+  "name": "go-full-stack-example",
   "version": "1.0.0",
   "description": "Frontend dependencies for the Go templ application",
   "private": true,
   "dependencies": {
     "htmx.org": "^2.0.7",
     "htmx-ext-response-targets": "^2.0.4",
-    "@picocss/pico": "^2.1.1",
     "ionicons": "^8.0.13"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "daisyui": "5.5.19",
+    "tailwindcss": "^4.2.2"
+  },
+  "engines": {
+    "bun": "1.3.11"
   }
 }
-

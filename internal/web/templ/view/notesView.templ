@@ -1,55 +1,69 @@
 package view
 
-import "github.com/sonjek/go-templ-htmx-picocss-example/internal/storage"
-import "github.com/sonjek/go-templ-htmx-picocss-example/internal/web/templ/components"
+import (
+    "github.com/sonjek/go-full-stack-example/internal/storage"
+    "github.com/sonjek/go-full-stack-example/internal/web/templ/components"
+)
 
 templ NotesView(notes []storage.Note) {
-    <h2 class="align-center">Notes</h2>
-    <div class="grid">
-        <p class="align-right">
-            <small><a class="contrast"
-                hx-trigger="click"
+    <div class="max-w-3xl mx-auto px-4">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-xl font-bold">Notes</h1>
+                <p class="text-sm text-base-content/60 mt-1">Manage your notes</p>
+            </div>
+            <button
+                class="btn btn-primary btn-sm shadow-md btn-outline"
                 hx-get="/add"
                 hx-target="#dialog"
+                hx-swap="outerHTML"
                 hx-target-error="#error"
-                hx-swap="outerHTML">Add new note</a></small>
-        </p>
-    </div>
-    <div id="dialog"/>
-    <div id="error"/>
-    <div id="notes">
-        if len(notes) != 0 {
-            @components.NotesList(notes)
-        }
-    </div>
+            >
+                <ion-icon name="add-outline" class="text-lg"></ion-icon>
+                <span>New Note</span>
+            </button>
+        </div>
 
-    <p id="no-notes" class="align-center">
-        Currently, there are no records. Create a new entry for display.
-    </p>
+        <div id="error" class="max-w-3xl mx-auto mb-4"></div>
 
-    <div aria-busy="true" class="htmx-indicator align-center">Loading more notes...</div>
+        <div id="notes">
+            if len(notes) != 0 {
+                @components.NotesList(notes)
+            }
+        </div>
+
+        <div id="no-notes" class={ "py-20 text-center", templ.KV("hidden", len(notes) != 0) }>
+            <p class="italic opacity-30 text-sm tracking-widest">
+                Currently, there are no records. Create a new entry for display.
+            </p>
+        </div>
+
+        <div class="htmx-indicator flex justify-center py-8">
+            <span class="loading loading-spinner loading-md text-primary/40"></span>
+        </div>
+    </div>
 
     <script>
-        closeDialog = () => {
-            let dialog = document.getElementById('dialog')
-            dialog.innerHTML = ''
-            dialog.close()
-        }
-        closeDialogOnSuccess = () => {
-            if (event.detail.xhr.status == 200) {
-                closeDialog()
-            }
-        }
-        clearError = () => {
-            document.getElementById('error').innerHTML = ''
-        }
+        window.closeDialog = () => {
+            const dialog = document.getElementById('dialog');
+            if (dialog) dialog.outerHTML = '<div id="dialog"></div>';
+        };
 
-        // Show no-notes text when there are no notes and hide after note added
-        htmx.on('htmx:afterRequest', function(e) {
-            // console.log(e.detail)
-            let notesElement = document.getElementById('notes')
-            let noNotesElement = document.getElementById('no-notes')
-            noNotesElement.style.display = !notesElement.childElementCount ? 'block' : 'none'
-        })
+        window.clearError = () => {
+            const err = document.getElementById('error');
+            if (err) err.innerHTML = '';
+        };
+
+        htmx.on('htmx:afterRequest', function(evt) {
+            // Only run for requests targeting #notes or a note element (note-*)
+            const target = evt.detail.target;
+            if (!target) return;
+            if (target.id !== 'notes' && !target.id?.startsWith('note-')) return;
+            const notes = document.getElementById('notes');
+            const noNotes = document.getElementById('no-notes');
+            if (notes && noNotes) {
+                noNotes.classList.toggle('hidden', notes.childElementCount > 0);
+            }
+        });
     </script>
 }

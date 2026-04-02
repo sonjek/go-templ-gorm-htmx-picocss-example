@@ -1,17 +1,11 @@
 package components
 
 templ ModalAddNote() {
-    <dialog open id="dialog">
-        <form
-            hx-post="/notes"
-            hx-target="#notes"
-            hx-target-error="#error"
-            hx-swap="afterbegin"
-            hx-indicator=".htmx-indicator"
-            hx-on::before-request="clearError()"
-            hx-on::after-request="closeDialogOnSuccess()"
-        >
-            @ModalForm("Add note", "Creating Note...", "Create", "", "")
-        </form>
-    </dialog>
+    @Modal(
+        "post",
+        "/notes",
+        "#notes",
+        "afterbegin",
+        ModalForm("New Note", "Saving...", "Create", "", ""),
+    )
 }
