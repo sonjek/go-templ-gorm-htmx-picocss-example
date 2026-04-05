@@ -12,8 +12,6 @@ templ ModalForm(title, loaderMsg, action, noteTitle, noteBody string) {
         </header>
 
         <div class="px-6 py-3 space-y-2">
-            <div id="modal-error" class="mb-2"></div>
-
             <div>
                 <label class="label pt-0 pb-0.5" for="note-form-title">
                     <span class="text-[11px] font-bold uppercase opacity-40">Title</span>
@@ -25,8 +23,9 @@ templ ModalForm(title, loaderMsg, action, noteTitle, noteBody string) {
                     placeholder="Note title..."
                     value={ noteTitle }
                     required
-                    class="input input-sm w-full max-w-none focus:input-primary bg-base-200/50 font-bold text-sm"
+                    class="input input-sm w-full max-w-none focus:input-primary bg-base-200/50 font-bold text-xs"
                 />
+                <span id="err-title" class="text-[11px] text-error font-medium block min-h-[1em]"></span>
             </div>
 
             <div>
@@ -37,8 +36,10 @@ templ ModalForm(title, loaderMsg, action, noteTitle, noteBody string) {
                     id="note-form-body"
                     name="body"
                     placeholder="Write something..."
-                    class="textarea textarea-md w-full max-w-none h-40 focus:textarea-primary bg-base-200/50 text-base-content/90 text-base leading-relaxed"
+                    required
+                    class="textarea textarea-md w-full max-w-none h-40 focus:textarea-primary bg-base-200/50 text-xs leading-relaxed"
                 >{ noteBody }</textarea>
+                <span id="err-body" class="text-[11px] text-error font-medium block min-h-[1em]"></span>
             </div>
 
             <div class="htmx-indicator flex items-center gap-2 text-primary/60">

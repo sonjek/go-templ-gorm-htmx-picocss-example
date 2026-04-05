@@ -9,12 +9,12 @@ all: help
 ## build: Compile templ files and build application
 .PHONY: build
 build: prepare-data
-	CGO_ENABLED=0 go build -ldflags="-s -w -extldflags '-static'" -trimpath -o 'bin/app' ./cmd/app
+	CGO_ENABLED=0 go build -tags swagger -ldflags="-s -w -extldflags '-static'" -trimpath -o 'bin/app' ./cmd/app
 
 ## start: Build and start application
 .PHONY: start
 start: prepare-data
-	go run ./cmd/app
+	go run -tags swagger ./cmd/app
 
 ## dev: Build and start application in live reload mode
 .PHONY: dev
@@ -28,11 +28,11 @@ build-docker:
 ## run-docker: Run Docker container image with this app
 .PHONY: run-docker
 run-docker:
-	docker run --rm -it -p 8089:8089 $(shell basename $(PWD)):latest
+	docker run --rm -it -p 3000:3000 $(shell basename $(PWD)):latest
 
 ## prepare-data: Prepare data for the application
 .PHONY: prepare-data
-prepare-data: .deps-stamp get-js-deps generate-web
+prepare-data: .deps-stamp get-js-deps generate-web generate-swagger
 
 .deps-stamp: go.mod go.sum
 	go mod download
@@ -65,6 +65,11 @@ test: check-go
 .PHONY: generate-web
 generate-web: check-go
 	go tool templ generate
+
+## generate-swagger: Generate swagger documentation via swaggo/swag
+.PHONY: generate-swagger
+generate-swagger: check-go
+	go tool swag init --dir ./cmd/app,./internal/web/handlers -g main.go --parseDependency --parseInternal
 
 ## air: Build and start application in live reload mode via air
 .PHONY: air

@@ -7,13 +7,5 @@ templ ErrorMsg(msg string) {
             <span class="text-[11px] font-black uppercase tracking-widest opacity-70">Error:</span>
             <span class="text-sm font-medium tracking-tight">{ msg }</span>
         </div>
-
-        <button
-            type="button"
-            class="btn btn-ghost btn-xs btn-circle hover:bg-error/20"
-            onclick="this.parentElement.remove()"
-        >
-            <ion-icon name="close-outline" class="text-lg"></ion-icon>
-        </button>
     </div>
 }

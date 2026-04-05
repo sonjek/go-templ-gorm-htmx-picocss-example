@@ -1,38 +1,56 @@
 package storage
 
 import (
-	_ "embed" //nolint:blank-imports
+	"os"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	_ "modernc.org/sqlite" //nolint:blank-imports
 )
 
-// Can be set to file::memory:?cache=shared
-const dataSourceName string = "file:sqlite.db?cache=shared&mode=rwc"
+const defaultDSN = "file:sqlite.db?cache=shared&mode=rwc"
 
-func NewDbStorage() *gorm.DB {
+func NewDbStorage() (*gorm.DB, error) {
+	dsn := os.Getenv("DB_DSN")
+	if dsn == "" {
+		dsn = defaultDSN
+	}
+	return openDb(dsn)
+}
+
+func NewInMemoryDbStorage() (*gorm.DB, error) {
+	return openDb(":memory:")
+}
+
+func openDb(dsn string) (*gorm.DB, error) {
 	db, err := gorm.Open(sqlite.New(sqlite.Config{
-		DSN:        dataSourceName,
+		DSN:        dsn,
 		DriverName: "sqlite",
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return db
+	return db, nil
 }
 
-func DBMigrate(db *gorm.DB) {
-	if err := db.AutoMigrate(&Note{}); err != nil {
-		panic("Failed to run migrations:" + err.Error())
-	}
+func DBMigrate(db *gorm.DB) error {
+	return db.AutoMigrate(&Note{})
 }
 
-func SeedData(db *gorm.DB) {
+func SeedData(db *gorm.DB) error {
 	var count int64
-	db.Model(&Note{}).Count(&count)
-	if count == 0 {
-		db.Create(&NotesSeed)
+	if err := db.Unscoped().Model(&Note{}).Count(&count).Error; err != nil {
+		return err
 	}
+	if count == 0 {
+		for i := range NotesSeed {
+			NotesSeed[i].UpdatedAt = NotesSeed[i].CreatedAt
+		}
+		return db.Create(&NotesSeed).Error
+	}
+	return nil
 }

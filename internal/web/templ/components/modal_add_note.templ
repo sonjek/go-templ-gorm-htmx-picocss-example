@@ -3,7 +3,7 @@ package components
 templ ModalAddNote() {
     @Modal(
         "post",
-        "/notes",
+        "/api/v1/notes",
         "#notes",
         "afterbegin",
         ModalForm("New Note", "Saving...", "Create", "", ""),

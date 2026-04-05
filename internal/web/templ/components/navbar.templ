@@ -7,10 +7,22 @@ templ Navbar() {
                 <div class="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
                     <ion-icon name="journal" class="text-primary-content text-sm"></ion-icon>
                 </div>
-                <span class="text-[11px] font-black uppercase tracking-[0.3em] opacity-70">Notebook</span>
+                <a href="/" class="text-[11px] font-black uppercase tracking-[0.3em] opacity-70">Notebook</a>
             </div>
 
             <div class="flex items-center">
+                <a href="/page-not-found" class="btn btn-ghost btn-xs btn-circle opacity-50" aria-label="Test 404 Page">
+                    <ion-icon name="help-outline" class="text-lg"></ion-icon>
+                </a>
+
+                <div class="w-px h-5 bg-neutral/30 mx-2"></div>
+
+                <a href="/monitor/api" class="btn btn-ghost btn-xs btn-circle opacity-50" aria-label="Monitor">
+                    <ion-icon name="pulse-outline" class="text-base"></ion-icon>
+                </a>
+
+                <div class="w-px h-5 bg-neutral/30 mx-2"></div>
+
                 <label class="swap swap-rotate btn btn-ghost btn-xs btn-circle">
                     <input type="checkbox" id="theme-toggle" class="theme-controller" value="light" />
                     <ion-icon name="sunny-outline" class="swap-on text-lg text-warning"></ion-icon>
@@ -19,25 +31,10 @@ templ Navbar() {
 
                 <div class="w-px h-5 bg-neutral/30 mx-2"></div>
 
-                <a href="/user" class="btn btn-ghost btn-xs btn-circle opacity-50" aria-label="User">
-                    <ion-icon name="person-outline" class="text-lg"></ion-icon>
+                <a href="/swagger/index.html" class="btn btn-ghost btn-xs btn-circle opacity-50" aria-label="Swagger">
+                    <ion-icon name="book-outline" class="text-lg"></ion-icon>
                 </a>
             </div>
         </div>
     </div>
-
-    <script>
-        (function() {
-            const toggle = document.getElementById('theme-toggle');
-            if (toggle) {
-                const currentTheme = document.documentElement.getAttribute("data-theme");
-                toggle.checked = currentTheme === "light";
-                toggle.addEventListener("change", (e) => {
-                    const newTheme = e.target.checked ? "light" : "dark";
-                    document.documentElement.setAttribute("data-theme", newTheme);
-                    localStorage.setItem("theme", newTheme);
-                });
-            }
-        })();
-    </script>
 }

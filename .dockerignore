@@ -1,2 +1,10 @@
 # Ref: https://docs.docker.com/reference/dockerfile/#dockerignore-file
 .git
+node_modules
+tmp
+bin
+*.db
+docs
+.air.toml
+bun.lock
+.deps-stamp
