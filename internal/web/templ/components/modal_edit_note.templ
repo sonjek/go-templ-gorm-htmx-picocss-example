@@ -8,7 +8,7 @@ import (
 templ ModalEditNote(note storage.Note) {
     @Modal(
         "put",
-        "/note/" + strconv.Itoa(note.ID),
+        "/api/v1/notes/" + strconv.Itoa(note.ID),
         "#note-" + strconv.Itoa(note.ID),
         "outerHTML",
         ModalForm("Edit Note", "Updating Note...", "Update Note", note.Title, note.Body),

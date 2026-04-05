@@ -2,158 +2,248 @@ package handlers
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
-	"time"
+	"strings"
 
+	"github.com/gofiber/fiber/v3"
+	"github.com/sonjek/go-full-stack-example/internal/service"
 	"github.com/sonjek/go-full-stack-example/internal/web/templ/components"
 	"github.com/sonjek/go-full-stack-example/internal/web/templ/page"
 	"github.com/sonjek/go-full-stack-example/internal/web/templ/view"
 )
 
 const (
-	pageSize  = 2
-	timeoutMs = 300
-
-	maxFormBodyBytes = 1 << 20 // 1 MiB
+	maxTitleLen = 65
+	maxBodyLen  = 500
 )
 
-func parseFormWithBodyLimit(w http.ResponseWriter, r *http.Request) error {
-	r.Body = http.MaxBytesReader(w, r.Body, maxFormBodyBytes)
-	return r.ParseForm()
-}
-
-func respondFormParseError(w http.ResponseWriter, r *http.Request, err error) {
-	var maxBytesErr *http.MaxBytesError
-	if errors.As(err, &maxBytesErr) {
-		w.WriteHeader(http.StatusRequestEntityTooLarge)
-		handleRenderError(components.ErrorMsg("Request body too large").Render(r.Context(), w))
-		return
-	}
-	sendErrorMsg(w, r, "Invalid form")
-}
-
-func (h *Handlers) Notes(w http.ResponseWriter, r *http.Request) {
-	notes, err := h.noteService.LoadMore(0, pageSize)
+// Notes godoc
+// @Summary      List notes
+// @Description  Get paginated notes with cursor-based pagination
+// @Tags         notes
+// @Produce      html
+// @Param        cursor  query     int  false  "Cursor for pagination"
+// @Success      200     {string} html  "Notes page rendered as HTML"
+// @Failure      400     {string} string "Error message"
+// @Router       /notes [get]
+func (h *Handlers) Notes(c fiber.Ctx) error {
+	cursor, err := parseCursor(c, 0)
 	if err != nil {
-		sendErrorMsg(w, r, "Note is empty")
+		return sendErrorMsg(c, "Invalid cursor parameter")
 	}
 
-	// Timeout for show loader
-	time.Sleep(timeoutMs * time.Millisecond)
+	notes, err := h.noteService.LoadMore(cursor)
+	if err != nil {
+		slog.Error("Failed to load notes", "error", err)
+		return sendErrorMsg(c, "Failed to load notes")
+	}
 
-	handleRenderError(page.Index(view.NotesView(notes)).Render(r.Context(), w))
+	return render(c, http.StatusOK, page.Index(view.NotesView(notes), getCSRFToken(c)))
 }
 
-func (h *Handlers) LoadMoreNotes(w http.ResponseWriter, r *http.Request) {
-	cursor := -1
-	if p := r.URL.Query().Get("cursor"); p != "" {
-		if parsedCursor, err := strconv.Atoi(p); err == nil {
-			cursor = parsedCursor
+// LoadMoreNotes godoc
+// @Summary      Load more notes
+// @Description  Load additional notes for infinite scroll (HTMX fragment)
+// @Tags         notes
+// @Produce      html
+// @Param        cursor  query     int  false  "Cursor for pagination"
+// @Success      200     {string} html  "Notes list fragment"
+// @Failure      400     {string} string "Error message"
+// @Router       /notes/load-more [get]
+func (h *Handlers) LoadMoreNotes(c fiber.Ctx) error {
+	cursor, err := parseCursor(c, 0)
+	if err != nil {
+		return sendErrorMsg(c, "Invalid cursor parameter")
+	}
+
+	notes, err := h.noteService.LoadMore(cursor)
+	if err != nil {
+		slog.Error("Failed to load more notes", "error", err, "cursor", cursor)
+		return sendErrorMsg(c, "Failed to load notes")
+	}
+
+	return render(c, http.StatusOK, components.NotesList(notes))
+}
+
+// CreateNoteModal godoc
+// @Summary      Get create note modal
+// @Description  Returns the HTML for the create note modal dialog
+// @Tags         notes
+// @Produce      html
+// @Success      200  {string}  html  "Modal HTML fragment"
+// @Router       /add [get]
+func (h *Handlers) CreateNoteModal(c fiber.Ctx) error {
+	return render(c, http.StatusOK, components.ModalAddNote())
+}
+
+// CreateNote godoc
+// @Summary      Create a note
+// @Description  Create a new note from form data
+// @Tags         notes
+// @Accept       x-www-form-urlencoded
+// @Produce      html
+// @Param        title  formData  string  true  "Note title"
+// @Param        body   formData  string  true  "Note body content"
+// @Success      200    {string}  html    "Created note as HTML card"
+// @Failure      400    {string}  string  "Error message"
+// @Router       /api/v1/notes [post]
+func (h *Handlers) CreateNote(c fiber.Ctx) error {
+	title := strings.TrimSpace(c.FormValue("title"))
+	body := strings.TrimSpace(c.FormValue("body"))
+
+	if errs := validateNote(title, body); len(errs) > 0 {
+		return sendFieldErrors(c, errs)
+	}
+
+	note, err := h.noteService.Create(title, body)
+	if err != nil {
+		if service.IsDuplicateTitle(err) {
+			return sendFieldErrors(c, fieldErrors{"title": service.MsgTitleAlreadyExists})
 		}
+		slog.Error("Failed to create note", "error", err)
+		return sendErrorMsg(c, "Failed to create note")
 	}
 
-	notes, err := h.noteService.LoadMore(cursor, pageSize)
+	return render(c, http.StatusOK, components.NoteItem(note))
+}
+
+// EditNoteModal godoc
+// @Summary      Get edit note modal
+// @Description  Returns the HTML for the edit note modal dialog
+// @Tags         notes
+// @Produce      html
+// @Param        id   path      int  true  "Note ID"
+// @Success      200  {string}  html  "Modal HTML fragment"
+// @Failure      400  {string}  string  "Error message"
+// @Router       /edit/{id} [get]
+func (h *Handlers) EditNoteModal(c fiber.Ctx) error {
+	noteID, err := parseNoteID(c)
 	if err != nil {
-		sendErrorMsg(w, r, "Note is empty")
+		return sendErrorMsg(c, "Invalid note ID")
 	}
 
-	// Timeout for show loader
-	time.Sleep(timeoutMs * time.Millisecond)
-
-	handleRenderError(components.NotesList(notes).Render(r.Context(), w))
-}
-
-func (h *Handlers) CreateNoteModal(w http.ResponseWriter, r *http.Request) {
-	handleRenderError(components.ModalAddNote().Render(r.Context(), w))
-}
-
-func (h *Handlers) CreateNote(w http.ResponseWriter, r *http.Request) {
-	if err := parseFormWithBodyLimit(w, r); err != nil {
-		respondFormParseError(w, r, err)
-		return
+	note, err := h.noteService.Get(noteID)
+	if err != nil {
+		if service.IsRecordNotFound(err) {
+			return sendErrorMsg(c, "Note not found")
+		}
+		slog.Error("Failed to get note", "error", err)
+		return sendErrorMsg(c, "Failed to load note")
 	}
 
-	title := r.PostForm.Get("title")
+	return render(c, http.StatusOK, components.ModalEditNote(note))
+}
+
+// EditNote godoc
+// @Summary      Update a note
+// @Description  Update an existing note by ID
+// @Tags         notes
+// @Accept       x-www-form-urlencoded
+// @Produce      html
+// @Param        id     path      int     true  "Note ID"
+// @Param        title  formData  string  true  "Note title"
+// @Param        body   formData  string  true  "Note body content"
+// @Success      200    {string}  html    "Updated note as HTML card"
+// @Failure      400    {string}  string  "Error message"
+// @Router       /api/v1/notes/{id} [put]
+func (h *Handlers) EditNote(c fiber.Ctx) error {
+	noteID, err := parseNoteID(c)
+	if err != nil {
+		return sendErrorMsg(c, "Invalid note ID")
+	}
+
+	title := strings.TrimSpace(c.FormValue("title"))
+	body := strings.TrimSpace(c.FormValue("body"))
+
+	if errs := validateNote(title, body); len(errs) > 0 {
+		return sendFieldErrors(c, errs)
+	}
+
+	note, err := h.noteService.FindAndUpdate(noteID, title, body)
+	if err != nil {
+		if service.IsRecordNotFound(err) {
+			return sendErrorMsg(c, "Note not found")
+		}
+		if service.IsDuplicateTitle(err) {
+			return sendFieldErrors(c, fieldErrors{"title": service.MsgTitleAlreadyExists})
+		}
+		slog.Error("Failed to update note", "error", err)
+		return sendErrorMsg(c, "Failed to update note")
+	}
+
+	return render(c, http.StatusOK, components.NoteItem(note))
+}
+
+// DeleteNote godoc
+// @Summary      Delete a note
+// @Description  Hard-delete a note by ID
+// @Tags         notes
+// @Param        id  path  int  true  "Note ID"
+// @Success      200  "Note deleted successfully"
+// @Failure      400  {string} string "Error message"
+// @Router       /api/v1/notes/{id} [delete]
+func (h *Handlers) DeleteNote(c fiber.Ctx) error {
+	noteID, err := parseNoteID(c)
+	if err != nil {
+		return sendErrorMsg(c, "Invalid note ID")
+	}
+
+	if err := h.noteService.Delete(noteID); err != nil {
+		if service.IsRecordNotFound(err) {
+			return sendErrorMsg(c, "Note not found")
+		}
+		slog.Error("Failed to delete note", "error", err)
+		return sendErrorMsg(c, "Failed to delete note")
+	}
+
+	return c.SendStatus(http.StatusOK)
+}
+
+func validateNote(title, body string) fieldErrors {
+	errs := fieldErrors{}
+
 	if title == "" {
-		sendErrorMsg(w, r, "Title is empty")
-		return
+		errs["title"] = "Title is empty"
+	} else if len(title) > maxTitleLen {
+		errs["title"] = "Title is too long. Maximum " + strconv.Itoa(maxTitleLen) + " characters."
 	}
 
-	body := r.PostForm.Get("body")
 	if body == "" {
-		sendErrorMsg(w, r, "Body is empty")
-		return
+		errs["body"] = "Body is empty"
+	} else if len(body) > maxBodyLen {
+		errs["body"] = "Body is too long. Maximum " + strconv.Itoa(maxBodyLen) + " characters."
 	}
 
-	note := h.noteService.Create(title, body)
-
-	// Timeout for show loader
-	time.Sleep(timeoutMs * time.Millisecond)
-
-	handleRenderError(components.NoteItem(note).Render(r.Context(), w))
+	return errs
 }
 
-func (h *Handlers) EditNoteModal(w http.ResponseWriter, r *http.Request) {
-	noteID := -1
-	if p := r.PathValue("id"); p != "" {
-		if parsedNoteID, err := strconv.Atoi(p); err == nil {
-			noteID = parsedNoteID
+func parseCursor(c fiber.Ctx, defaultVal int) (int, error) {
+	if p := c.Query("cursor"); p != "" {
+		parsed, err := strconv.Atoi(p)
+		if err != nil {
+			slog.Warn("Invalid cursor parameter", "cursor", p)
+			return 0, errors.New("invalid cursor parameter")
 		}
+		return parsed, nil
 	}
+	return defaultVal, nil
+}
 
+func parseNoteID(c fiber.Ctx) (int, error) {
+	p := c.Params("id")
+	if p == "" {
+		return 0, errors.New("note ID is empty")
+	}
+	noteID, err := strconv.Atoi(p)
+	if err != nil {
+		slog.Warn("Invalid note ID format", "id", p)
+		return 0, errors.New("invalid note ID")
+	}
 	if noteID < 1 {
-		sendErrorMsg(w, r, "Wrong note ID")
-		return
+		slog.Warn("Note ID out of range", "id", noteID)
+		return 0, errors.New("invalid note ID")
 	}
-
-	note := h.noteService.Get(noteID)
-
-	handleRenderError(components.ModalEditNote(note).Render(r.Context(), w))
-}
-
-func (h *Handlers) EditNote(w http.ResponseWriter, r *http.Request) {
-	if err := parseFormWithBodyLimit(w, r); err != nil {
-		respondFormParseError(w, r, err)
-		return
-	}
-
-	title := r.PostForm.Get("title")
-	if title == "" {
-		sendErrorMsg(w, r, "Title is empty")
-		return
-	}
-
-	body := r.PostForm.Get("body")
-	if body == "" {
-		sendErrorMsg(w, r, "Body is empty")
-		return
-	}
-
-	noteID := -1
-	if p := r.PathValue("id"); p != "" {
-		if parsedNoteID, err := strconv.Atoi(p); err == nil {
-			noteID = parsedNoteID
-		}
-	}
-
-	note := h.noteService.FindAndUpdate(noteID, title, body)
-
-	// Timeout for show loader
-	time.Sleep(timeoutMs * time.Millisecond)
-
-	handleRenderError(components.NoteItem(note).Render(r.Context(), w))
-}
-
-func (h *Handlers) DeleteNote(w http.ResponseWriter, r *http.Request) {
-	noteID := r.PathValue("id")
-	if noteID == "" {
-		sendErrorMsg(w, r, "Note ID is empty")
-		return
-	}
-
-	// Timeout for show loader
-	time.Sleep(timeoutMs * time.Millisecond)
-
-	h.noteService.Delete(noteID)
+	return noteID, nil
 }

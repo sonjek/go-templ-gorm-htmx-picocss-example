@@ -2,11 +2,14 @@ package storage
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 var NotesSeed = []Note{
+	{
+		Title:     "Swagger",
+		Body:      "Swagger is a tool for generating API documentation from code.",
+		CreatedAt: time.Date(2013, 8, 20, 12, 8, 0, 0, time.UTC),
+	},
 	{
 		Title:     "gorm",
 		Body:      "The fantastic ORM library for Golang, aims to be developer friendly.",
@@ -43,6 +46,12 @@ var NotesSeed = []Note{
 		CreatedAt: time.Date(2021, 5, 16, 22, 33, 0, 0, time.UTC),
 	},
 	{
+		Title: "Bun",
+		Body: "Incredibly fast, modern runtime, bundler, " +
+			"test runner and package manager for JavaScript/TypeScript.",
+		CreatedAt: time.Date(2021, 9, 14, 12, 48, 0, 0, time.UTC),
+	},
+	{
 		Title:     "htmx.js",
 		Body:      "</> htmx - high power tools for HTML.",
 		CreatedAt: time.Date(2022, 8, 10, 21, 21, 0, 0, time.UTC),
@@ -54,11 +63,12 @@ var NotesSeed = []Note{
 	},
 }
 
+// Note represents a note entity in the database.
+// @Description Note entity with title, body, and timestamps.
 type Note struct {
-	ID        int            `form:"id" json:"id" gorm:"primaryKey"`
-	Title     string         `form:"title" json:"title" binding:"required"`
-	Body      string         `form:"body" json:"body" binding:"required"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID        int       `json:"id" gorm:"primaryKey"`
+	Title     string    `json:"title" gorm:"uniqueIndex"`
+	Body      string    `json:"body"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

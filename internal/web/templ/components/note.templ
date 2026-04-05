@@ -2,7 +2,8 @@ package components
 
 import (
     "strconv"
-    "github.com/sonjek/go-full-stack-example/pkg/datetime"
+
+    "github.com/dustin/go-humanize"
     "github.com/sonjek/go-full-stack-example/internal/storage"
 )
 
@@ -15,6 +16,7 @@ templ NoteItem(note storage.Note, loadMoreURL ...string) {
             hx-trigger="intersect once"
             hx-target="this"
             hx-swap="afterend"
+            hx-target-error="#error"
             hx-push-url="false"
             hx-indicator=".htmx-indicator"
         }
@@ -27,21 +29,21 @@ templ NoteItem(note storage.Note, loadMoreURL ...string) {
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle btn-xs">
                     <ion-icon name="ellipsis-vertical" class="text-lg"></ion-icon>
                 </div>
-                <ul tabindex="0" class="dropdown-content z-[10] menu w-40 p-2 bg-base-200/40">
+                <ul tabindex="0" class="dropdown-content z-[10] menu w-30 p-4 shadow bg-base-100 border border-neutral rounded-box">
                     <li>
                         <a
                             hx-get={ "/edit/" + strconv.Itoa(note.ID) }
                             hx-target="#dialog"
                             hx-swap="outerHTML"
-                            hx-target-error="#error"
+                            hx-on::after-request="if(!event.detail.successful){const e=document.getElementById('error');if(e)e.innerHTML=event.detail.xhr.responseText}"
                         >Edit</a>
                     </li>
                     <li>
                         <a
-                            hx-delete={ "/note/" + strconv.Itoa(note.ID) }
+                            hx-delete={ "/api/v1/notes/" + strconv.Itoa(note.ID) }
                             hx-target={ "#note-" + strconv.Itoa(note.ID) }
                             hx-swap="delete"
-                            hx-target-error="#error"
+                            hx-on::after-request="this.closest('.card').remove()"
                             class="text-error"
                         >Delete</a>
                     </li>
@@ -50,7 +52,7 @@ templ NoteItem(note storage.Note, loadMoreURL ...string) {
         </div>
 
         <div class="card-body p-6 border-b border-neutral">
-            <p class="text-base-content/90 whitespace-pre-wrap leading-relaxed">
+            <p class="whitespace-pre-wrap leading-relaxed">
                 { note.Body }
             </p>
         </div>
@@ -58,15 +60,11 @@ templ NoteItem(note storage.Note, loadMoreURL ...string) {
         <div class="px-6 py-3 rounded-b-2xl flex justify-between items-center text-[10px] font-bold opacity-40">
             <div class="flex items-center gap-1">
                 <ion-icon name="time-outline"></ion-icon>
-                <span>{ datetime.FormatToDateTime(note.CreatedAt) } ({ datetime.FormatToAgo(note.CreatedAt) })</span>
+                <span>{ note.CreatedAt.Format("2006-01-02 15:04") } ({ humanize.Time(note.CreatedAt) })</span>
             </div>
             <div class="badge badge-sm px-2">
             { note.ID }
             </div>
         </div>
     </div>
-}
-
-templ LastNote(note storage.Note) {
-    @NoteItem(note, "/notes/load-more?cursor=" + strconv.Itoa(note.ID))
 }

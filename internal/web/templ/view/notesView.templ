@@ -23,9 +23,7 @@ templ NotesView(notes []storage.Note) {
                 <span>New Note</span>
             </button>
         </div>
-
         <div id="error" class="max-w-3xl mx-auto mb-4"></div>
-
         <div id="notes">
             if len(notes) != 0 {
                 @components.NotesList(notes)
@@ -42,28 +40,4 @@ templ NotesView(notes []storage.Note) {
             <span class="loading loading-spinner loading-md text-primary/40"></span>
         </div>
     </div>
-
-    <script>
-        window.closeDialog = () => {
-            const dialog = document.getElementById('dialog');
-            if (dialog) dialog.outerHTML = '<div id="dialog"></div>';
-        };
-
-        window.clearError = () => {
-            const err = document.getElementById('error');
-            if (err) err.innerHTML = '';
-        };
-
-        htmx.on('htmx:afterRequest', function(evt) {
-            // Only run for requests targeting #notes or a note element (note-*)
-            const target = evt.detail.target;
-            if (!target) return;
-            if (target.id !== 'notes' && !target.id?.startsWith('note-')) return;
-            const notes = document.getElementById('notes');
-            const noNotes = document.getElementById('no-notes');
-            if (notes && noNotes) {
-                noNotes.classList.toggle('hidden', notes.childElementCount > 0);
-            }
-        });
-    </script>
 }

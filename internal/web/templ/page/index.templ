@@ -4,22 +4,17 @@ import (
     "github.com/sonjek/go-full-stack-example/internal/web/templ/components"
 )
 
-templ Index(body templ.Component) {
+templ Index(body templ.Component, csrfToken string) {
     <!DOCTYPE html>
     <html lang="en">
         <head>
             <meta charset="UTF-8"/>
             <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
             <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            <script>
-                (function() {
-                    const theme = localStorage.getItem("theme") ||
-                        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-                    document.documentElement.setAttribute("data-theme", theme);
-                })();
-            </script>
+            <meta name="csrf-token" content={ csrfToken }/>
             <script src="/static/js/htmx.min.js"></script>
             <script src="/static/js/response-targets.min.js"></script>
+            <script src="/static/js/app.js"></script>
             <link href="/static/css/style.css" rel="stylesheet"/>
             <script type="module" src="/static/js/ionicons/ionicons.esm.js"></script>
             <title>Notes App</title>
